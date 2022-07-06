@@ -10,12 +10,31 @@ import java.util.regex.Pattern
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
 
+    companion object {
+        const val EXTRA_NICKNAME = "NICKNAME"
+        const val EXTRA_EMAIL = "EMAIL"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         initViews()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(EXTRA_NICKNAME, binding.nicknameEditText.text.toString())
+        outState.putString(EXTRA_EMAIL, binding.emailEditText.text.toString())
+
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+
+        binding.nicknameEditText.setText(savedInstanceState.getString(EXTRA_NICKNAME))
+        binding.emailEditText.setText(savedInstanceState.getString(EXTRA_EMAIL))
     }
 
     private fun initViews() = with(binding) {
