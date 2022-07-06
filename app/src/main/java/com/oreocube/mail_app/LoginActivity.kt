@@ -1,5 +1,6 @@
 package com.oreocube.mail_app
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.oreocube.mail_app.databinding.ActivityLoginBinding
@@ -62,6 +63,17 @@ class LoginActivity : AppCompatActivity() {
                 emailTextInput.helperText = getString(R.string.error_email)
                 hideNextButton()
             }
+        }
+
+
+        nextButton.setOnClickListener {
+            startActivity(
+                Intent(this@LoginActivity, MainActivity::class.java).apply {
+                    putExtra(EXTRA_NICKNAME, nicknameEditText.text.toString())
+                    putExtra(EXTRA_EMAIL, emailEditText.text.toString())
+                }
+            )
+            finish()
         }
     }
 
