@@ -11,4 +11,6 @@
     <string name="menu_primary">Primary</string>
     <string name="menu_social">Social</string>
     <string name="menu_promotions">Promotions</string>
+
+    <string name="user_info_text">닉네임 : %s\n이메일 : %s</string>
 </resources>

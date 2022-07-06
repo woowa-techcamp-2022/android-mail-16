@@ -3,12 +3,20 @@ package com.oreocube.mail_app
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.commit
 import com.oreocube.mail_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
+    private val userNickname by lazy { intent.getStringExtra(EXTRA_NICKNAME) }
+    private val userEmail by lazy { intent.getStringExtra(EXTRA_EMAIL) }
+
+    companion object {
+        const val EXTRA_NICKNAME = "NICKNAME"
+        const val EXTRA_EMAIL = "EMAIL"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +62,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.nav_settings -> {
                     supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, SettingFragment.newInstance())
+                        replace(R.id.fragmentContainer, SettingFragment.newInstance().apply {
+                            arguments = bundleOf(
+                                EXTRA_NICKNAME to userNickname,
+                                EXTRA_EMAIL to userEmail
+                            )
+                        })
                     }
                     true
                 }

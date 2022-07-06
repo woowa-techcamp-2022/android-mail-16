@@ -9,6 +9,8 @@ import com.oreocube.mail_app.databinding.FragmentSettingBinding
 
 class SettingFragment : Fragment() {
     private lateinit var binding: FragmentSettingBinding
+    private val userNickname by lazy { arguments?.getString(MainActivity.EXTRA_NICKNAME) }
+    private val userEmail by lazy { arguments?.getString(MainActivity.EXTRA_EMAIL) }
 
     companion object {
         fun newInstance(): SettingFragment {
@@ -22,6 +24,7 @@ class SettingFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentSettingBinding.inflate(layoutInflater)
+        binding.infoTextView.text = getString(R.string.user_info_text, userNickname, userEmail)
         return binding.root
     }
 }

@@ -69,8 +69,8 @@ class LoginActivity : AppCompatActivity() {
         nextButton.setOnClickListener {
             startActivity(
                 Intent(this@LoginActivity, MainActivity::class.java).apply {
-                    putExtra(EXTRA_NICKNAME, nicknameEditText.text.toString())
-                    putExtra(EXTRA_EMAIL, emailEditText.text.toString())
+                    putExtra(MainActivity.EXTRA_NICKNAME, nicknameEditText.text.toString())
+                    putExtra(MainActivity.EXTRA_EMAIL, emailEditText.text.toString())
                 }
             )
             finish()
