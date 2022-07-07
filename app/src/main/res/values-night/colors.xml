@@ -8,5 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <color name="mail_title">#FF000000</color>
+    <color name="mail_title">#FFFFFFFF</color>
 </resources>

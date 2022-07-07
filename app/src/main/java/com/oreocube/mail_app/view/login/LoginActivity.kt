@@ -1,4 +1,4 @@
-package com.oreocube.mail_app
+package com.oreocube.mail_app.view.login
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,8 @@ import android.os.Bundle
 import com.oreocube.mail_app.databinding.ActivityLoginBinding
 import android.util.Patterns
 import androidx.core.widget.addTextChangedListener
+import com.oreocube.mail_app.view.main.MainActivity
+import com.oreocube.mail_app.R
 import java.util.regex.Pattern
 
 class LoginActivity : AppCompatActivity() {
@@ -69,8 +71,8 @@ class LoginActivity : AppCompatActivity() {
         nextButton.setOnClickListener {
             startActivity(
                 Intent(this@LoginActivity, MainActivity::class.java).apply {
-                    putExtra(EXTRA_NICKNAME, nicknameEditText.text.toString())
-                    putExtra(EXTRA_EMAIL, emailEditText.text.toString())
+                    putExtra(MainActivity.EXTRA_NICKNAME, nicknameEditText.text.toString())
+                    putExtra(MainActivity.EXTRA_EMAIL, emailEditText.text.toString())
                 }
             )
             finish()
