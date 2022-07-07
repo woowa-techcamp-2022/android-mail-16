@@ -1,4 +1,4 @@
-package com.oreocube.mail_app
+package com.oreocube.mail_app.view.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.commit
+import com.oreocube.mail_app.R
 import com.oreocube.mail_app.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {

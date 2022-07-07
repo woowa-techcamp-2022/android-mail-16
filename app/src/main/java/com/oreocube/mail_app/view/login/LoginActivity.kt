@@ -1,4 +1,4 @@
-package com.oreocube.mail_app
+package com.oreocube.mail_app.view.login
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,8 @@ import android.os.Bundle
 import com.oreocube.mail_app.databinding.ActivityLoginBinding
 import android.util.Patterns
 import androidx.core.widget.addTextChangedListener
+import com.oreocube.mail_app.view.main.MainActivity
+import com.oreocube.mail_app.R
 import java.util.regex.Pattern
 
 class LoginActivity : AppCompatActivity() {

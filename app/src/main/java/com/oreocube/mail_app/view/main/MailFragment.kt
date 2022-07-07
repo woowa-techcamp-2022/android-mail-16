@@ -1,4 +1,4 @@
-package com.oreocube.mail_app
+package com.oreocube.mail_app.view.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.oreocube.mail_app.MailAdapter
 import com.oreocube.mail_app.databinding.FragmentMailBinding
 import com.oreocube.mail_app.model.getMailList
 
