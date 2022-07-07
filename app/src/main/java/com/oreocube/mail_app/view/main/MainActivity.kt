@@ -2,12 +2,12 @@ package com.oreocube.mail_app.view.main
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.commit
 import com.oreocube.mail_app.R
 import com.oreocube.mail_app.databinding.ActivityMainBinding
+import com.oreocube.mail_app.model.MailType
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         initViews()
 
         supportFragmentManager.commit {
-            replace(R.id.fragmentContainer, MailFragment.newInstance())
+            replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
         }
     }
 
@@ -39,14 +39,22 @@ class MainActivity : AppCompatActivity() {
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_primary -> {
-                    Toast.makeText(this@MainActivity, "primary clicked", Toast.LENGTH_SHORT).show()
+                    supportFragmentManager.commit {
+                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
+                    }
                 }
                 R.id.nav_social -> {
-                    Toast.makeText(this@MainActivity, "social clicked", Toast.LENGTH_SHORT).show()
+                    supportFragmentManager.commit {
+                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.SOCIAL))
+                    }
                 }
                 R.id.nav_promotions -> {
-                    Toast.makeText(this@MainActivity, "promotions clicked", Toast.LENGTH_SHORT)
-                        .show()
+                    supportFragmentManager.commit {
+                        replace(
+                            R.id.fragmentContainer,
+                            MailFragment.newInstance(MailType.PROMOTIONS)
+                        )
+                    }
                 }
             }
             binding.drawerLayout.closeDrawers()
@@ -57,7 +65,7 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_mail -> {
                     supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, MailFragment.newInstance())
+                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
                     }
                     true
                 }

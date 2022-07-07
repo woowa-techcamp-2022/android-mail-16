@@ -1,5 +1,11 @@
 package com.oreocube.mail_app.model
 
-enum class MailType {
-    PRIMARY, SOCIAL, PROMOTIONS
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+enum class MailType : Parcelable {
+    PRIMARY,
+    SOCIAL,
+    PROMOTIONS
 }
