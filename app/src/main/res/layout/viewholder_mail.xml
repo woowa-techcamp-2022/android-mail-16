@@ -6,14 +6,6 @@
     android:layout_height="wrap_content"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/iconImageView"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:src="@drawable/ic_person"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/firstLetterTextView"
         android:layout_width="60dp"
@@ -37,7 +29,7 @@
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iconImageView"
+        app:layout_constraintStart_toEndOf="@id/firstLetterTextView"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="David" />
 

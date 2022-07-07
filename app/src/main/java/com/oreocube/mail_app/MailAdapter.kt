@@ -1,14 +1,13 @@
 package com.oreocube.mail_app
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.oreocube.mail_app.databinding.ViewholderMailBinding
 import com.oreocube.mail_app.model.MailModel
-import java.util.regex.Pattern
 
 class MailAdapter : ListAdapter<MailModel, MailAdapter.ViewHolder>(DiffUtil) {
 
@@ -16,11 +15,13 @@ class MailAdapter : ListAdapter<MailModel, MailAdapter.ViewHolder>(DiffUtil) {
         RecyclerView.ViewHolder(binding.root) {
         fun bind(mailModel: MailModel) = with(binding) {
 
-            if (Pattern.matches("^[a-zA-Z].*", mailModel.sender)) {
-                firstLetterTextView.text = mailModel.sender.first().uppercase()
-                firstLetterTextView.isVisible = true
+            if (mailModel.firstLetter != null) {
+                firstLetterTextView.text = mailModel.firstLetter
+                firstLetterTextView.setBackgroundResource(0)
+                firstLetterTextView.setBackgroundColor(Color.CYAN)
             } else {
-                firstLetterTextView.isVisible = false
+                firstLetterTextView.text = ""
+                firstLetterTextView.setBackgroundResource(R.drawable.ic_person)
             }
 
             senderTextView.text = mailModel.sender
