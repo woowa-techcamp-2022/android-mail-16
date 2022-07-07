@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 enum class MailType : Parcelable {
-    PRIMARY,
-    SOCIAL,
-    PROMOTIONS
+    Primary,
+    Social,
+    Promotions
 }

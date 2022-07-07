@@ -1,18 +1,36 @@
 package com.oreocube.mail_app.view.main
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.res.Configuration
 import android.os.Bundle
+import android.view.MenuItem
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
-import androidx.fragment.app.commit
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
+import com.google.android.material.navigation.NavigationBarView
 import com.oreocube.mail_app.R
 import com.oreocube.mail_app.databinding.ActivityMainBinding
 import com.oreocube.mail_app.model.MailType
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
+    private val viewModel: MainViewModel by viewModels()
+
     private val userNickname by lazy { intent.getStringExtra(EXTRA_NICKNAME) }
     private val userEmail by lazy { intent.getStringExtra(EXTRA_EMAIL) }
+
+    private val mailFragment = MailFragment.newInstance()
+    private val settingFragment by lazy {
+        SettingFragment.newInstance().apply {
+            arguments = bundleOf(
+                EXTRA_NICKNAME to userNickname,
+                EXTRA_EMAIL to userEmail
+            )
+        }
+    }
 
     companion object {
         const val EXTRA_NICKNAME = "NICKNAME"
@@ -24,10 +42,36 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        checkScreenWidth()
         initViews()
 
-        supportFragmentManager.commit {
-            replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
+        viewModel.screenStateLiveData.observe(this) {
+            when (it) {
+                is ScreenState.MailScreen -> showFragment(mailFragment)
+                is ScreenState.SettingScreen -> showFragment(settingFragment)
+            }
+        }
+    }
+
+    private fun showFragment(fragment: Fragment) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragmentContainer, fragment)
+            .commit()
+    }
+
+    private fun checkScreenWidth() {
+        val density = resources.displayMetrics.density
+        val width = resources.displayMetrics.widthPixels
+        val dpWidth = width / density
+
+        // 가로가 600dp 이상이거나 화면이 가로 모드이면 RailView 사용
+        // ORIENTATION_LANDSCAPE : 가로 모드, ORIENTATION_PORTRAIT : 세로 모드
+        if (dpWidth > 600 || resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            binding.bottomNavigationView.isGone = true
+            binding.navigationRailView.isVisible = true
+        } else {
+            binding.navigationRailView.isGone = true
+            binding.bottomNavigationView.isVisible = true
         }
     }
 
@@ -35,52 +79,67 @@ class MainActivity : AppCompatActivity() {
         topAppBar.setNavigationOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
+        navigationRailView.setOnItemSelectedListener(this@MainActivity)
+        bottomNavigationView.setOnItemSelectedListener(this@MainActivity)
+        initNavigationView()
+    }
 
+    private fun initNavigationView() = with(binding) {
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_primary -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
-                    }
+                    viewModel.mailTypeLiveData.value = MailType.Primary
                 }
                 R.id.nav_social -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.SOCIAL))
-                    }
+                    viewModel.mailTypeLiveData.value = MailType.Social
                 }
                 R.id.nav_promotions -> {
-                    supportFragmentManager.commit {
-                        replace(
-                            R.id.fragmentContainer,
-                            MailFragment.newInstance(MailType.PROMOTIONS)
-                        )
-                    }
+                    viewModel.mailTypeLiveData.value = MailType.Promotions
                 }
             }
-            binding.drawerLayout.closeDrawers()
+            viewModel.screenStateLiveData.value = ScreenState.MailScreen
+            bottomNavigationView.selectedItemId = R.id.nav_mail
+            drawerLayout.closeDrawers()
             true
         }
+    }
 
-        bottomNavigationView.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_mail -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, MailFragment.newInstance(MailType.PRIMARY))
+    // BottomNavigationView, RailView 이벤트 처리
+    override fun onNavigationItemSelected(item: MenuItem): Boolean =
+        when (item.itemId) {
+            R.id.nav_mail -> {
+                viewModel.screenStateLiveData.value = ScreenState.MailScreen
+                true
+            }
+            R.id.nav_settings -> {
+                viewModel.screenStateLiveData.value = ScreenState.SettingScreen
+                true
+            }
+            else -> false
+        }
+
+    // 뒤로가기를 눌렀을 때
+    override fun onBackPressed() {
+        // drawer 열려있으면 닫기
+        if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawers()
+        } else {
+            when (viewModel.screenStateLiveData.value) {
+                is ScreenState.MailScreen -> {
+                    // 현재 보이는 화면이 Primary Mail 화면이면 종료
+                    if (viewModel.mailTypeLiveData.value == MailType.Primary) {
+                        super.onBackPressed()
                     }
-                    true
-                }
-                R.id.nav_settings -> {
-                    supportFragmentManager.commit {
-                        replace(R.id.fragmentContainer, SettingFragment.newInstance().apply {
-                            arguments = bundleOf(
-                                EXTRA_NICKNAME to userNickname,
-                                EXTRA_EMAIL to userEmail
-                            )
-                        })
+                    // Social, Promotions Mail 화면이면 Primary 화면으로
+                    else {
+                        viewModel.mailTypeLiveData.value = MailType.Primary
                     }
-                    true
                 }
-                else -> false
+                is ScreenState.SettingScreen -> {
+                    binding.bottomNavigationView.selectedItemId = R.id.nav_mail
+                    viewModel.mailTypeLiveData.value = MailType.Primary
+                }
+                else -> {}
             }
         }
     }
