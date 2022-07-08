@@ -44,29 +44,28 @@ class LoginActivity : AppCompatActivity() {
         nicknameEditText.addTextChangedListener {
             if (isAvailableNickname(it.toString())) {
                 // 올바른 닉네임 형식이면
-                nicknameTextInput.helperText = null
+                nicknameTextInput.error = null
                 if (isAvailableEmail(emailEditText.text.toString())) {
                     showNextButton()
                 }
             } else {
-                nicknameTextInput.helperText = getString(R.string.error_nickname)
+                nicknameTextInput.error = getString(R.string.error_nickname)
                 hideNextButton()
             }
         }
         emailEditText.addTextChangedListener {
             // 올바른 이메일 형식이면
             if (isAvailableEmail(it.toString())) {
-                emailTextInput.helperText = null
+                emailTextInput.error = null
                 // 닉네임까지 모두 올바른 형식이면
                 if (isAvailableNickname(nicknameEditText.text.toString())) {
                     showNextButton()
                 }
             } else {
-                emailTextInput.helperText = getString(R.string.error_email)
+                emailTextInput.error = getString(R.string.error_email)
                 hideNextButton()
             }
         }
-
 
         nextButton.setOnClickListener {
             startActivity(
