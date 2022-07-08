@@ -9,4 +9,6 @@
     <color name="white">#FFFFFFFF</color>
 
     <color name="mail_title">#FFFFFFFF</color>
+    <color name="login_logo_color">#FFBDC1C6</color>
+    <color name="profile_image_color">#FFBDC1C6</color>
 </resources>
