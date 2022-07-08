@@ -18,9 +18,10 @@ class MailAdapter : ListAdapter<MailModel, MailAdapter.ViewHolder>(DiffUtil) {
             if (mailModel.firstLetter != null) {
                 firstLetterTextView.text = mailModel.firstLetter
                 firstLetterTextView.setBackgroundResource(0)
-                firstLetterTextView.setBackgroundColor(Color.CYAN)
+                firstLetterTextView.setBackgroundColor(mailModel.backgroundColor)
             } else {
                 firstLetterTextView.text = ""
+                firstLetterTextView.setBackgroundColor(Color.TRANSPARENT)
                 firstLetterTextView.setBackgroundResource(R.drawable.ic_person)
             }
 
