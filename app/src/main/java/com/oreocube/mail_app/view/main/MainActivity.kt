@@ -88,17 +88,17 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         navigationView.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_primary -> {
-                    viewModel.mailTypeLiveData.value = MailType.Primary
+                    setSelectedMailType(MailType.Primary)
                 }
                 R.id.nav_social -> {
-                    viewModel.mailTypeLiveData.value = MailType.Social
+                    setSelectedMailType(MailType.Social)
                 }
                 R.id.nav_promotions -> {
-                    viewModel.mailTypeLiveData.value = MailType.Promotions
+                    setSelectedMailType(MailType.Promotions)
                 }
             }
-            viewModel.screenStateLiveData.value = ScreenState.MailScreen
-            bottomNavigationView.selectedItemId = R.id.nav_mail
+            setScreenState(ScreenState.MailScreen)
+            setNavigationSelectedItem(R.id.nav_mail)
             drawerLayout.closeDrawers()
             true
         }
@@ -108,11 +108,11 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     override fun onNavigationItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.nav_mail -> {
-                viewModel.screenStateLiveData.value = ScreenState.MailScreen
+                setScreenState(ScreenState.MailScreen)
                 true
             }
             R.id.nav_settings -> {
-                viewModel.screenStateLiveData.value = ScreenState.SettingScreen
+                setScreenState(ScreenState.SettingScreen)
                 true
             }
             else -> false
@@ -132,15 +132,28 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                     }
                     // Social, Promotions Mail 화면이면 Primary 화면으로
                     else {
-                        viewModel.mailTypeLiveData.value = MailType.Primary
+                        setSelectedMailType(MailType.Primary)
                     }
                 }
                 is ScreenState.SettingScreen -> {
-                    binding.bottomNavigationView.selectedItemId = R.id.nav_mail
-                    viewModel.mailTypeLiveData.value = MailType.Primary
+                    setNavigationSelectedItem(R.id.nav_mail)
+                    setSelectedMailType(MailType.Primary)
                 }
                 else -> {}
             }
         }
+    }
+
+    private fun setNavigationSelectedItem(id: Int) {
+        binding.bottomNavigationView.selectedItemId = id
+        binding.navigationRailView.selectedItemId = id
+    }
+
+    private fun setSelectedMailType(type: MailType) {
+        viewModel.mailTypeLiveData.value = type
+    }
+
+    private fun setScreenState(state: ScreenState) {
+        viewModel.screenStateLiveData.value = state
     }
 }
