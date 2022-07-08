@@ -12,7 +12,7 @@
         android:layout_height="60dp"
         android:background="@drawable/icon_background"
         android:gravity="center"
-        android:textColor="@color/mail_title"
+        android:textColor="@color/white"
         android:textSize="28sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
