@@ -3,7 +3,6 @@ package com.oreocube.mail_app.view.main
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
@@ -17,12 +16,15 @@ import com.oreocube.mail_app.model.MailType
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener {
     private lateinit var binding: ActivityMainBinding
-    private val viewModel: MainViewModel by viewModels()
+
+    private var currentScreenState = R.id.nav_primary
 
     private val userNickname by lazy { intent.getStringExtra(EXTRA_NICKNAME) }
     private val userEmail by lazy { intent.getStringExtra(EXTRA_EMAIL) }
 
-    private val mailFragment = MailFragment.newInstance()
+    private val primaryMailFragment = MailFragment.newInstance(MailType.Primary)
+    private val socialMailFragment = MailFragment.newInstance(MailType.Social)
+    private val promotionMailFragment = MailFragment.newInstance(MailType.Promotions)
     private val settingFragment by lazy {
         SettingFragment.newInstance().apply {
             arguments = bundleOf(
@@ -35,6 +37,12 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     companion object {
         const val EXTRA_NICKNAME = "NICKNAME"
         const val EXTRA_EMAIL = "EMAIL"
+
+        const val SCREEN_STATE_KEY = "SCREEN_STATE"
+        const val TAG_PRIMARY = "PRIMARY"
+        const val TAG_SOCIAL = "SOCIAL"
+        const val TAG_PROMOTIONS = "PROMOTIONS"
+        const val TAG_SETTINGS = "SETTINGS"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,18 +53,27 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         checkScreenWidth()
         initViews()
 
-        viewModel.screenStateLiveData.observe(this) {
-            when (it) {
-                is ScreenState.MailScreen -> showFragment(mailFragment)
-                is ScreenState.SettingScreen -> showFragment(settingFragment)
-            }
-        }
+        showFragment(primaryMailFragment, TAG_PRIMARY)
     }
 
-    private fun showFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
-            .commit()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(SCREEN_STATE_KEY, currentScreenState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        when (val id = savedInstanceState.getInt(SCREEN_STATE_KEY)) {
+            R.id.nav_settings -> {
+                setNavigationSelectedItem(id)
+            }
+            R.id.nav_social -> {
+                showFragment(socialMailFragment, TAG_SOCIAL)
+            }
+            R.id.nav_promotions -> {
+                showFragment(promotionMailFragment, TAG_PROMOTIONS)
+            }
+        }
+        super.onRestoreInstanceState(savedInstanceState)
     }
 
     private fun checkScreenWidth() {
@@ -86,19 +103,23 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     private fun initNavigationView() = with(binding) {
         navigationView.setNavigationItemSelectedListener { item ->
+            if (currentScreenState == R.id.nav_settings) {
+                setNavigationSelectedItem(R.id.nav_mail)
+            }
             when (item.itemId) {
                 R.id.nav_primary -> {
-                    setSelectedMailType(MailType.Primary)
+                    currentScreenState = R.id.nav_primary
+                    showFragment(primaryMailFragment, TAG_PRIMARY)
                 }
                 R.id.nav_social -> {
-                    setSelectedMailType(MailType.Social)
+                    currentScreenState = R.id.nav_social
+                    showFragment(socialMailFragment, TAG_SOCIAL)
                 }
                 R.id.nav_promotions -> {
-                    setSelectedMailType(MailType.Promotions)
+                    currentScreenState = R.id.nav_promotions
+                    showFragment(promotionMailFragment, TAG_PROMOTIONS)
                 }
             }
-            setScreenState(ScreenState.MailScreen)
-            setNavigationSelectedItem(R.id.nav_mail)
             drawerLayout.closeDrawers()
             true
         }
@@ -108,11 +129,13 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     override fun onNavigationItemSelected(item: MenuItem): Boolean =
         when (item.itemId) {
             R.id.nav_mail -> {
-                setScreenState(ScreenState.MailScreen)
+                currentScreenState = R.id.nav_primary
+                showFragment(primaryMailFragment, TAG_PRIMARY)
                 true
             }
             R.id.nav_settings -> {
-                setScreenState(ScreenState.SettingScreen)
+                currentScreenState = R.id.nav_settings
+                showFragment(settingFragment, TAG_SETTINGS)
                 true
             }
             else -> false
@@ -124,22 +147,12 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
             binding.drawerLayout.closeDrawers()
         } else {
-            when (viewModel.screenStateLiveData.value) {
-                is ScreenState.MailScreen -> {
-                    // 현재 보이는 화면이 Primary Mail 화면이면 종료
-                    if (viewModel.mailTypeLiveData.value == MailType.Primary) {
-                        super.onBackPressed()
-                    }
-                    // Social, Promotions Mail 화면이면 Primary 화면으로
-                    else {
-                        setSelectedMailType(MailType.Primary)
-                    }
-                }
-                is ScreenState.SettingScreen -> {
-                    setNavigationSelectedItem(R.id.nav_mail)
-                    setSelectedMailType(MailType.Primary)
-                }
-                else -> {}
+            if (currentScreenState != R.id.nav_primary) {
+                currentScreenState = R.id.nav_primary
+                setNavigationSelectedItem(R.id.nav_mail)
+                binding.navigationView.setCheckedItem(R.id.nav_primary)
+            } else {
+                super.onBackPressed()
             }
         }
     }
@@ -149,11 +162,23 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         binding.navigationRailView.selectedItemId = id
     }
 
-    private fun setSelectedMailType(type: MailType) {
-        viewModel.mailTypeLiveData.value = type
+    private fun showFragment(fragment: Fragment, tag: String) {
+        val findFragment = supportFragmentManager.findFragmentByTag(tag)
+
+        // 프래그먼트가 교체되기 전에 모든 프래그먼트 숨기기
+        supportFragmentManager.fragments.forEach {
+            supportFragmentManager.beginTransaction().hide(it).commit()
+        }
+
+        findFragment?.let {
+            // 해당 프래그먼트가 있으면 보여주기
+            supportFragmentManager.beginTransaction().show(it).commit()
+        } ?: run {
+            // 없으면 새 프래그먼트 추가
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, fragment, tag)
+                .commitAllowingStateLoss() // 손실 허용
+        }
     }
 
-    private fun setScreenState(state: ScreenState) {
-        viewModel.screenStateLiveData.value = state
-    }
 }
